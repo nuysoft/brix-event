@@ -27,6 +27,30 @@
     <hr>
     <div id="container" style="margin: 60px 50px;"></div>
 
+    <!--  -->
+    <div id="target">
+        <div bx-click="foo(42)">click here</div>
+    </div>
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
+            // 定义宿主对象，可以是任意对象
+            var owner = {
+                foo: function(event, arg) {
+                    console.log(this, this === owner)
+                    console.log(event.type, arg)
+                }
+            }
+            // 指定目标容器节点
+            var target = $('#target')
+            // 绑定 Event 的方法至宿主对象
+            _.extend(owner, Event)
+            // 绑定
+            owner.delegateBxTypeEvents( target )
+            // 移除
+            // owner.undelegateBxTypeEvents( target )
+        })
+    </script>
+
     <!-- Include the actual tests. -->
     <script src="./test.event.js"></script>
     
