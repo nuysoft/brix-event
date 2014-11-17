@@ -1,6 +1,25 @@
 /* global require, console */
 /* global chai, describe, before, it */
 /* jshint multistr: true */
+/*
+    ## BDD
+    1. 结构 
+        describe
+            [ describe ]
+            before after beforeEach afterEach
+            it
+    2. 常用 expect
+        expect().to
+            .equal .deep.equal .not.equal
+            .have.length .with.length
+            .have.property .have.deep.property
+            .to.be.a .to.be.an
+            .that
+    3. 速度 test.speed
+        slow > 75
+        75 / 2 < medium < 75
+        fast < 75 / 2
+ */
 describe('Event', function() {
 
     this.timeout(1000)
