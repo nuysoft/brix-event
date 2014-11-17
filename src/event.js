@@ -49,7 +49,7 @@ define(
             /*
                 #### .delegateBxTypeEvents( [ element ] )
 
-                在节点 `element` 上代理 `bx-type` 风格的事件监听函数。
+                在节点 `element` 上代理 `bx-type` 风格的事件监听函数。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
             */
             delegateBxTypeEvents: function(element) {
                 element = element || this.element
@@ -75,7 +75,7 @@ define(
             /*
                 #### .undelegateBxTypeEvents()
 
-                从节点 `element` 上移除 `bx-type` 风格的事件监听函数。
+                从节点 `element` 上移除 `bx-type` 风格的事件监听函数。。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
             */
             undelegateBxTypeEvents: function(element) {
                 element = element || this.element

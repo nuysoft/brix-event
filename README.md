@@ -16,10 +16,10 @@ require.config({
     paths: {
         jquery: 'bower_components/jquery/dist/jquery',
         underscore: 'bower_components/underscore/underscore',
-        'brix/event': 'src/event'
+        'brix/event': 'bower_components/brix-event/src/event'
     }
 })
-```js
+```
 
 ```html
 // 定义 HTML
@@ -29,7 +29,7 @@ require.config({
 ```
 
 ```js
-// 绑定 bx-type 风格的事件
+// 使用 Brix Event
 require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
     // 定义宿主对象，可以是任意对象
     var owner = {
@@ -42,9 +42,9 @@ require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
     var target = $('#target')
     // 绑定 Event 的方法至宿主对象
     _.extend(owner, Event)
-    // 绑定
+    // 绑定 bx-type 风格的事件
     owner.delegateBxTypeEvents( target )
-    // 移除
+    // 移除 bx-type 风格的事件
     // owner.undelegateBxTypeEvents( target )
 })
 ```
@@ -57,11 +57,11 @@ require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
 
 * Event.delegateBxTypeEvents( [ element ] )
 
-    在节点 `element` 上代理 `bx-type` 风格的事件监听函数。
+    在节点 `element` 上代理 `bx-type` 风格的事件监听函数。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
 
 * Event.undelegateBxTypeEvents( [ element ] )
 
-    从节点 `element` 上移除 `bx-type` 风格的事件监听函数。
+    从节点 `element` 上移除 `bx-type` 风格的事件监听函数。。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
 
 * Event.setup( [ prefix ] )
 
@@ -125,8 +125,12 @@ _.extend(owner, Event)
 owner.delegateBxTypeEvents()
 ```
 
+在上面的代码中，有几点改进之处可以借鉴：
+
 首先，通过增加语义化的名称 `changeDate`，会使代码更加容易阅读和查找。
+
 其次，方法 `changeDate` 合并了相似的代码。这种方式使得提升代码复用性更加容易。
+
 并且，通过在方法 `changeDate` 中增加 `if (!event.type) dir = event`，使得可以直接执行 `changeDate(dir)` ，而不需要依赖事件系统。这可以让测试代码不再依赖事件系统。
 
 #### 结论
