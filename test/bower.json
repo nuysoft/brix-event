@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "dependencies": {},
+  "devDependencies": {
+    "requirejs": "*",
+    "mocha": "*",
+    "chai": "*",
+    "underscore": "*",
+    "jquery": "*"
+  }
+}
