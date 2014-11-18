@@ -22,7 +22,7 @@ require.config({
 ```
 
 ```html
-// 定义 HTML
+<!-- 定义 HTML -->
 <div id="target">
     <div bx-click="foo(42)">click here</div>
 </div>
