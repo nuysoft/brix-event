@@ -4,10 +4,12 @@
 /*
     ## BDD
     1. 结构 
-        describe
+        describe suite
             [ describe ]
             before after beforeEach afterEach
-            it
+            it test
+        done
+            搜索 this.async = fn && fn.length
     2. 常用 expect
         expect().to
             .equal .deep.equal .not.equal
@@ -15,7 +17,8 @@
             .have.property .have.deep.property
             .to.be.a .to.be.an
             .that
-    3. 速度 test.speed
+    3. 速度 
+        搜索 test.speed
         slow > 75
         75 / 2 < medium < 75
         fast < 75 / 2
@@ -585,6 +588,10 @@ describe('Event', function() {
 
     // TODO
     describe('bx-selector-type', function() {
+        after(function(done) {
+            container.empty()
+            done()
+        })
         it('<div bx-body-click="foo( 42, \'42\' )">hello</div>', function(done) {
             container.html(this.test.title)
             var owner = {
@@ -625,6 +632,7 @@ describe('Event', function() {
                     expect(event.type).to.equal('click')
                     expect(arg1).to.equal(44)
                     expect(arg2).to.equal('44')
+                        // setTimeout( done, 35 )
                     done()
                 }
             }
