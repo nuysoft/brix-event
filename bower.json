@@ -4,6 +4,9 @@
   "ignore": [
     "**/.*"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "jquery": "*",
+    "underscore": "*"
+  },
   "devDependencies": {}
 }

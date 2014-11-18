@@ -1,5 +1,5 @@
-/* global require, console */
-/* global chai, describe, before, it */
+/* global require */
+/* global chai, describe, before, after, beforeEach, afterEach, it */
 /* jshint multistr: true */
 /*
     ## BDD
@@ -135,7 +135,7 @@ describe('Event', function() {
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
             var bxEvents = Event._parseBxEvents($(this.test.title))
             expect(bxEvents).to.be.an('array').with.length(4)
-            _.each(bxEvents, function(bxEvent, index) {
+            _.each(bxEvents, function(bxEvent /*, index*/ ) {
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -150,7 +150,7 @@ describe('Event', function() {
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
             var bxEvents = Event._parseBxEvents($(this.test.title + this.test.title + this.test.title))
             expect(bxEvents).to.be.an('array').with.length(12)
-            _.each(bxEvents, function(bxEvent, index) {
+            _.each(bxEvents, function(bxEvent/*, index*/) {
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -204,7 +204,7 @@ describe('Event', function() {
 
             var bxEvents = Event._parseBxEvents(container, true)
             expect(bxEvents).to.be.an('array').with.length(types.length * 3)
-            _.each(bxEvents, function(bxEvent, index) {
+            _.each(bxEvents, function(bxEvent/*, index*/) {
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -352,9 +352,10 @@ describe('Event', function() {
                     done()
                 }
             }
-            var element = container.find('div')[0]
-            Event._delegateBxTypeEvents(owner, element)
-            element.click()
+            var $element = container.find('div')
+            Event._delegateBxTypeEvents(owner, $element[0])
+            if ($element[0].click) $element[0].click()
+            else $element.click()
         })
     })
 
@@ -439,7 +440,8 @@ describe('Event', function() {
             }
             var $element = container.find('div')
             Event._delegateBxTypeEvents(owner, container, true)
-            $element[0].click()
+            if ($element[0].click) $element[0].click()
+            else $element.click()
         })
     })
 
@@ -475,7 +477,7 @@ describe('Event', function() {
 
             Event._delegateBxTypeEvents(owner, container, true)
 
-            _.each(types, function(type, index) {
+            _.each(types, function(type/*, index*/) {
                 $('[bx-' + type + ']', container).trigger(type)
             })
 
@@ -519,7 +521,7 @@ describe('Event', function() {
 
             owner.delegateBxTypeEvents()
 
-            _.each(types, function(type, index) {
+            _.each(types, function(type/*, index*/) {
                 $('[bx-' + type + ']', container).trigger(type)
             })
 
@@ -576,7 +578,7 @@ describe('Event', function() {
 
             owner.delegateBxTypeEvents()
 
-            _.each(types, function(type, index) {
+            _.each(types, function(type/*, index*/) {
                 $('[bx-' + type + ']', container).trigger(type)
             })
 

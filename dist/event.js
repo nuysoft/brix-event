@@ -1,7 +1,8 @@
+
 /* global define */
-/* global setTimeout */
+/* global window, document, location, console */
 define(
-    [
+    'brix/event',[
         'jquery', 'underscore'
     ],
     function(
@@ -105,7 +106,6 @@ define(
 
                 var bxtype = PREFIX + type
                 var selector = '[' + PREFIX + type + ']' // 'bx-' + type
-                var $target = $element
 
                 if (DEBUG) {
                     console.log(DEBUG.fix(type, 16), bxtype)
@@ -175,6 +175,7 @@ define(
         function _undelegateBxTypeEvents(element, deep) {
             var $element = jQuery(element)
             var bxevents = $element.data()._bxevents
+            /* jshint unused:false */
             _.each(bxevents, function(flag, type) {
                 bxevents[type] = false
 
@@ -212,11 +213,11 @@ define(
                 ma[1] === 'document' && 　jQuery(document) ||
                 ma[1] === 'body' && 　jQuery(document.body)
 
-            $target.on(ma[2] + NAMESPACE, _appetizer)
-            $target.on(bxtype + NAMESPACE, _entrees)
+            $target.on(ma[2] + NAMESPACE, _bxTargetTypeAppetizer)
+            $target.on(bxtype + NAMESPACE, _bxTargetTypeEntrees)
 
             // 开胃菜
-            function _appetizer(event) {
+            function _bxTargetTypeAppetizer(event) {
                 var originalType = event.type // click
                 event.type = bxtype // bx-window-click
                 jQuery(event.target).trigger(event, [].slice.call(arguments, 1))
@@ -224,14 +225,14 @@ define(
             }
 
             // 主菜
-            function _entrees(event) {
+            function _bxTargetTypeEntrees(event) {
                 var selector = '[' + PREFIX + type + ']'
                 var $targets = function() {
                     var targets = []
                     if (jQuery(event.target).is(selector)) targets.push(event.target)
                     var parents = jQuery(event.target).parentsUntil(element, selector)
                     targets = targets.concat(parents.toArray())
-                    return $(targets)
+                    return jQuery(targets)
                 }()
 
                 // bx-target-type ==> type
@@ -241,7 +242,7 @@ define(
 
                 var extraParameters = [].slice.call(arguments, 2)
 
-                _.each($targets, function(item, index) {
+                _.each($targets, function(item /*, index*/ ) {
                     var handler = jQuery(item).attr(currentType)
                     if (!handler) return
 
@@ -262,7 +263,7 @@ define(
         }
 
         // TODO
-        function _undelegateBxTargetTypeEvents(type, element) {
+        function _undelegateBxTargetTypeEvents(type /*, element*/ ) {
             RE_BX_TARGET_TYPE.exec('')
             var ma = RE_BX_TARGET_TYPE.exec(type)
             if (!ma) throw '不支持 ' + type
@@ -384,4 +385,4 @@ define(
         }
 
     }
-)
+);
