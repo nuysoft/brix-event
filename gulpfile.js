@@ -5,7 +5,7 @@ var rjs = require('gulp-requirejs')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
 
 var globs = ['src/**/*.js', 'test/*.js', 'gulpfile.js']
-var tasks = ['jshint', 'rjs', 'test']
+var watchTasks = ['jshint', 'rjs', 'test']
 
 // https://github.com/spenceralger/gulp-jshint
 gulp.task('jshint', function() {
@@ -22,8 +22,8 @@ gulp.task('rjs', function() {
         name: 'brix/event',
         out: 'dist/event.js',
         paths: {
-            jquery: "empty:",
-            underscore: "empty:"
+            jquery: 'empty:',
+            underscore: 'empty:'
         }
     }
     rjs(build)
@@ -32,7 +32,7 @@ gulp.task('rjs', function() {
 
 // https://github.com/floatdrop/gulp-watch
 gulp.task('watch', function( /*callback*/ ) {
-    gulp.watch(globs, tasks)
+    gulp.watch(globs, watchTasks)
 })
 
 // https://github.com/mrhooray/gulp-mocha-phantomjs
@@ -43,4 +43,4 @@ gulp.task('test', function() {
         }))
 })
 
-gulp.task('default', tasks.concat(['watch']))
+gulp.task('default', watchTasks.concat(['watch']))
