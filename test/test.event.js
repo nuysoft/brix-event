@@ -13,6 +13,7 @@
     2. 常用 expect
         expect().to
             .equal .deep.equal .not.equal
+            .match
             .have.length .with.length
             .have.property .have.deep.property
             .to.be.a .to.be.an
