@@ -1,6 +1,6 @@
 {
   "name": "brix-event",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "代理 bx-type 风格的事件监听函数。",
   "main": "gulpfile.js",
   "scripts": {
@@ -11,12 +11,12 @@
     "url": "git@gitlab.alibaba-inc.com:thx/brix-event.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "gulp": "^3.8.10",
-    "gulp-jshint": "^1.9.0",
-    "jshint-stylish": "^1.0.0",
+    "gulp": "*",
+    "gulp-jshint": "*",
+    "jshint-stylish": "*",
     "gulp-requirejs": "*",
-    "gulp-mocha-phantomjs": "^0.5.1"
+    "gulp-mocha-phantomjs": "*"
   }
 }
