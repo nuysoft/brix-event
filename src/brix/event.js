@@ -69,8 +69,11 @@ define(
         return Event
 
         function _delegateBxTypeEvents(prefix, element, owner) {
+            var SEPARATION = 'bx-event-separation'
             var $body = jQuery(document.body)
             var $element = jQuery(element)
+            var separation = Math.random()
+            $element.data(SEPARATION, separation)
             var data = $element.data()
             if (!data._bxevents) data._bxevents = {}
 
@@ -98,13 +101,20 @@ define(
                 $element.data(bxtype, __entrees)
 
                 function __entrees(event) {
-                    // console.log(element.nodeType)
-                    if ($element[0] === event.currentTarget ||
-                        jQuery(element).has(event.currentTarget).length
-                    ) {
-                        var extraParameters = [].slice.call(arguments, 1)
-                        _entrees.apply(this, [event, owner, prefix].concat(extraParameters))
+                    var parents = jQuery(event.currentTarget).parents()
+                    var lastestSeparation = jQuery(event.currentTarget).data(SEPARATION)
+                    if (!lastestSeparation) {
+                        for (var i = 0; i < parents.length; i++) {
+                            if (parents.eq(i).data(SEPARATION)) {
+                                lastestSeparation = parents.eq(i).data(SEPARATION)
+                                break
+                            }
+                        }
                     }
+                    if (lastestSeparation !== separation) return
+
+                    var extraParameters = [].slice.call(arguments, 1)
+                    _entrees.apply(this, [event, owner, prefix].concat(extraParameters))
                 }
             })
         }
