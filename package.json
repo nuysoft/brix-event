@@ -1,6 +1,6 @@
 {
   "name": "brix-event",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "代理 bx-type 风格的事件监听函数。",
   "main": "gulpfile.js",
   "scripts": {

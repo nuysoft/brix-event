@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test: Brix Event </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- Include RequireJS -->
+    <script src="./bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                jquery: 'bower_components/jquery/dist/jquery',
+                underscore: 'bower_components/underscore/underscore',
+                'brix/event': 'dist/event'
+            }
+        })
+    </script>
+    
+    <!--  -->
+    <!-- 
+        1. 嵌套 owner
+        2. 重复渲染后，重复绑定
+     -->
+    <div id="target" style="margin: 60px 50px;">
+        <span>owner1</span>
+        <ul>
+            <li bx-click="foo(1)">1</li>
+            <li bx-click="foo(2)">
+                <span>2</span>
+                <ul>
+                    <li bx-click="foo(2.1)">2.1</li>
+                    <li id="target22" bx-click="foo(2.2)">
+                        <span>2.2(owner2)</span>
+                        <ul>
+                            <li bx-click="foo(2.2.1)">2.2.1</li>
+                            <li bx-click="stop(2.2.2)">2.2.2 stop</li>
+                        </ul>
+                    </li>
+                    <li bx-click="stop(2.3)">2.3 stop</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
+            // 初始化一个事件对象
+            BXEvent = Event()
+            // 定义宿主对象，可以是任意对象
+            var owner1 = {
+                foo: function(event, arg) {
+                    console.log('owner1', event.type, arg)
+                },
+                stop: function(event, arg){
+                    console.log('owner1', event.type, arg, 'stop')
+                    event.stopPropagation()
+                }
+            }
+            var owner2 = {
+                foo: function(event, arg) {
+                    console.log('owner2', event.type, arg)
+                },
+                stop: function(event, arg){
+                    console.log('owner2', event.type, arg, 'stop')
+                    event.stopPropagation()
+                }
+            }
+            // 绑定
+            BXEvent.delegateBxTypeEvents( $('#target'), owner1 )
+            BXEvent.delegateBxTypeEvents( $('#target22'), owner2 )
+            // BXEvent.delegateBxTypeEvents( target, owner )
+            // 移除
+            // BXEvent.undelegateBxTypeEvents( $('#target') )
+            // BXEvent.undelegateBxTypeEvents( $('#target22') )
+        })
+    </script>
+
+</body>
+</html>

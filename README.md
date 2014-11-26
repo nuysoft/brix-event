@@ -61,7 +61,7 @@ require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
 
 * Event.undelegateBxTypeEvents( [ element ] )
 
-    从节点 `element` 上移除 `bx-type` 风格的事件监听函数。。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
+    从节点 `element` 上移除 `bx-type` 风格的事件监听函数。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
 
 * Event.setup( [ prefix ] )
 
