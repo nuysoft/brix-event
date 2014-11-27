@@ -21,10 +21,10 @@ define(
 
         var RE_TARGET_TYPE = /^(window|document|body)-(.+)/
 
-        function Event(prefix) {
+        function EventManager(prefix) {
             // Allow instantiation without the 'new' keyword
-            if (!(this instanceof Event)) {
-                return new Event(prefix)
+            if (!(this instanceof EventManager)) {
+                return new EventManager(prefix)
             }
 
             this.prefix = prefix || 'bx-'
@@ -32,9 +32,12 @@ define(
             // 原型方法 => 实例方法
             this.delegateBxTypeEvents = this.delegateBxTypeEvents
             this.undelegateBxTypeEvents = this.undelegateBxTypeEvents
+            // 缩短方法名
+            this.delegate = this.delegateBxTypeEvents
+            this.undelegate = this.undelegateBxTypeEvents
         }
 
-        Event.prototype.delegateBxTypeEvents = function(element, owner) {
+        EventManager.prototype.delegateBxTypeEvents = function(element, owner) {
             element = element || this.element
             owner = owner || this
 
@@ -45,6 +48,7 @@ define(
                 console.log(element)
             }
 
+            _undelegateBxTypeEvents(this.prefix, element)
             _delegateBxTypeEvents(this.prefix, element, owner)
 
             if (DEBUG) {
@@ -53,20 +57,26 @@ define(
             }
         }
 
-        Event.prototype.undelegateBxTypeEvents = function(element) {
+        EventManager.prototype.undelegateBxTypeEvents = function(element) {
             element = element || this.element
-            _undelegateBxTypeEvents(this.prefix, element, false)
-            _undelegateBxTypeEvents(this.prefix, element, true)
+            _undelegateBxTypeEvents(this.prefix, element)
         }
 
         // 静态方法
-        Event._delegateBxTypeEvents = _delegateBxTypeEvents
-        Event._undelegateBxTypeEvents = _undelegateBxTypeEvents
-        Event._parseBxTypes = _parseBxTypes
-        Event._parseBxEvents = _parseBxEvents
-        Event._parseMethodAndParams = _parseMethodAndParams
+        EventManager.prefix = 'bx-'
+        EventManager.delegateBxTypeEvents = EventManager.prototype.delegateBxTypeEvents
+        EventManager.undelegateBxTypeEvents = EventManager.prototype.undelegateBxTypeEvents
+        EventManager._delegateBxTypeEvents = _delegateBxTypeEvents
+        EventManager._undelegateBxTypeEvents = _undelegateBxTypeEvents
+        EventManager._parseBxTypes = _parseBxTypes
+        EventManager._parseBxEvents = _parseBxEvents
+        EventManager._parseMethodAndParams = _parseMethodAndParams
 
-        return Event
+        // 缩短方法名
+        EventManager.delegate = EventManager.prototype.delegateBxTypeEvents
+        EventManager.undelegate = EventManager.prototype.undelegateBxTypeEvents
+
+        return EventManager
 
         function _delegateBxTypeEvents(prefix, element, owner) {
             var SEPARATION = 'bx-event-separation'
@@ -96,11 +106,14 @@ define(
                     return
                 }
 
-                $body.on(type + NAMESPACE, selector, __entrees)
+                $body.on(type + NAMESPACE, selector, _appetizer)
 
-                $element.data(bxtype, __entrees)
+                $element.data(bxtype, _appetizer)
 
-                function __entrees(event) {
+                // 开胃菜
+                function _appetizer(event) {
+                    if (jQuery(event.target).closest('.disabled').length) return
+
                     var parents = jQuery(event.currentTarget).parents()
                     var lastestSeparation = jQuery(event.currentTarget).data(SEPARATION)
                     if (!lastestSeparation) {
@@ -157,9 +170,9 @@ define(
                 }
 
                 var selector = '[' + bxtype + ']'
-                var __entrees = $element.data(bxtype)
+                var _appetizer = $element.data(bxtype)
 
-                $body.off(type + NAMESPACE, selector, __entrees)
+                $body.off(type + NAMESPACE, selector, _appetizer)
             })
         }
 
