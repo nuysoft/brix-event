@@ -1,6 +1,6 @@
 # Brix Event
 
-支持 **bx-type** 风格的事件模型，实现事件与与 DOM 结构的松耦合，提升可读性、可复用性和可测试性。
+支持 **bx-type** 风格的事件模型，实现事件与 DOM 结构的松耦合，提升可读性、可复用性和可测试性。
 
 ### 安装 <small>Install</small>
 
@@ -16,7 +16,7 @@ require.config({
     paths: {
         jquery: 'bower_components/jquery/dist/jquery',
         underscore: 'bower_components/underscore/underscore',
-        'brix/event': 'bower_components/brix-event/src/event'
+        'brix/event': 'bower_components/brix-event/dist/event'
     }
 })
 ```
@@ -30,7 +30,9 @@ require.config({
 
 ```js
 // 使用 Brix Event
-require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
+require(['jquery', 'brix/event'], function($, EventManager) {
+    // 定义事件管理器
+    var manager = new EventManager('bx-')
     // 定义宿主对象，可以是任意对象
     var owner = {
         foo: function(event, arg) {
@@ -40,36 +42,34 @@ require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
     }
     // 指定目标容器节点
     var target = $('#target')
-    // 绑定 Event 的方法至宿主对象
-    _.extend(owner, Event)
     // 绑定 bx-type 风格的事件
-    owner.delegateBxTypeEvents( target )
+    manager.delegate( target, owner )
     // 移除 bx-type 风格的事件
-    // owner.undelegateBxTypeEvents( target )
+    // manager.undelegate( target )
 })
 ```
 
-> 必须指定数组对象，否则默认为 Event 对象。
+> 必须指定宿主对象。
 
 ### 方法 <small>Methods</small>
 
 共计 3 个公开方法：
 
-* Event.delegateBxTypeEvents( [ element ] )
+* EventManager( prefix )
 
-    在节点 `element` 上代理 `bx-type` 风格的事件监听函数。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
+    构造函数。构造一个事件管理器。
 
-* Event.undelegateBxTypeEvents( [ element ] )
+* .delegate( element, owner )
+
+    在节点 `element` 上代理 `bx-type` 风格的事件监听函数，事件监听函数定义在宿主对象 `owner` 中。
+
+* .undelegate( element )
 
     从节点 `element` 上移除 `bx-type` 风格的事件监听函数。参数 `element` 是可选的，如果未传入，则默认为 `this.element`。
 
-* Event.setup( [ prefix ] )
-
-    读取或设置 `bx-type` 风格中的前缀 `bx-`。
-
 ### WHY BX-TYPE
 
-通常，我们用 `$( selector ).on( events [, selector ] [, data ], handler )` 来绑定事件。
+通常，我们用 `.on( events [, selector ] [, data ], handler )` 来绑定事件。
 
 这么做的主要问题在于，会与选择器表达式 `selector` 紧密耦合，即与 DOM 结构和 CSS 类样式紧密耦合。当选择器表达式 `selector` 比较复杂时，更加明显。
 
@@ -110,19 +110,19 @@ $container
 <button class="minux" bx-click="changeDate(-1)">-</button>
 <button class="plus" bx-click="changeDate(1)">+</button>
 ```
-在 JavaScript 代码中，可以把 `that.date.add(-1, 'month')` 和 `that.date.add(-1, 'month')` 合并为方法 `changeDate`：
+
+在 JavaScript 代码中，可以把 `owner.date.add(-1, 'month')` 和 `owner.date.add(-1, 'month')` 合并为方法 `changeDate`：
 
 ```js
 var owner = {
-    element: $('#container'),
     date: moment(),
     changeDate: function(event, dir) {
         if (!event.type) dir = event
         this.date.add(dir, 'month')
     }
 }
-_.extend(owner, Event)
-owner.delegateBxTypeEvents()
+var manager = new EventManager('bx-')
+manager.delegate( $('#container'), owner )
 ```
 
 在上面的代码中，有几点改进之处可以借鉴：
@@ -131,7 +131,7 @@ owner.delegateBxTypeEvents()
 
 其次，方法 `changeDate` 合并了相似的代码。这种方式使得提升代码复用性更加容易。
 
-并且，通过在方法 `changeDate` 中增加 `if (!event.type) dir = event`，使得可以直接执行 `changeDate(dir)` ，而不需要依赖事件系统。这可以让测试代码不再依赖事件系统。
+并且，通过在方法 `changeDate` 中增加 `if (!event.type) dir = event`，使得可以直接执行 `changeDate(dir)` ，而不再需要依赖事件系统。这可以让测试代码不再依赖事件系统。
 
 #### 结论
 
@@ -139,7 +139,7 @@ owner.delegateBxTypeEvents()
 
 #### 结语
 
-早在 AngularJS 之前，Magix 就已引入了 **bx-type** 风格的事件模型。这次提取为独立库，实现和 API 更加清晰，希望能复用到更多的框架和库中，
+早在 [AngularJS](http://angularjs.org/) 之前，[Magix](http://thx.github.io/magix/articles/about-delegate-event/) 就已引入了 **bx-type** 风格的事件模型。这次提取为独立库，实现和 API 更加清晰，希望能复用到更多的框架和库中，
 
 ### HOW BX-TYPE
 
@@ -149,11 +149,11 @@ owner.delegateBxTypeEvents()
 
 ### WHAT BX-TYPE
 
-提供了两个方法：`.delegateBxTypeEvents()`、`.undelegateBxTypeEvents`，分别用于绑定和移除 **bx-type** 风格的事件。
+提供了两个方法：`.delegate()`、`.undelegate`，分别用于绑定和移除 **bx-type** 风格的事件。
 
 ```js
+// 定义宿主对象，可以是任意对象
 var owner = {
-    element: element,
     method1: function(event, extra) {
         // ...
     },
@@ -161,7 +161,12 @@ var owner = {
         // ...
     }
 }
-_.extend(owner, Event)
-owner.delegateBxTypeEvents()
-owner.undelegateBxTypeEvents()
+// 指定目标容器节点
+var target = $('#target')
+// 定义事件管理器
+var manager = new EventManager('bx-')
+// 绑定 bx-type 风格的事件
+manager.delegate( target, owner )
+// 移除 bx-type 风格的事件
+// manager.undelegate( target )
 ```

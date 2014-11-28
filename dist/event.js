@@ -33,6 +33,7 @@ define(
             // 原型方法 => 实例方法
             this.delegateBxTypeEvents = this.delegateBxTypeEvents
             this.undelegateBxTypeEvents = this.undelegateBxTypeEvents
+
             // 缩短方法名
             this.delegate = this.delegateBxTypeEvents
             this.undelegate = this.undelegateBxTypeEvents

@@ -45,9 +45,9 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
-            // 初始化一个事件对象
-            BXEvent = Event()
+        require(['jquery', 'underscore', 'brix/event'], function($, _, EventManager) {
+            // 定义事件管理器
+            var manager = new EventManager('bx-')
             // 定义宿主对象，可以是任意对象
             var owner1 = {
                 foo: function(event, arg) {
@@ -68,8 +68,8 @@
                 }
             }
             // 绑定
-            BXEvent.delegateBxTypeEvents( $('#target'), owner1 )
-            BXEvent.delegateBxTypeEvents( $('#target22'), owner2 )
+            manager.delegate( $('#target'), owner1 )
+            manager.delegate( $('#target22'), owner2 )
             // BXEvent.delegateBxTypeEvents( target, owner )
             // 移除
             // BXEvent.undelegateBxTypeEvents( $('#target') )
