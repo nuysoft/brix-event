@@ -32,8 +32,8 @@
         <div bx-click="foo(42)">click here</div>
     </div>
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'brix/event'], function($, _, Event) {
-            var BXEvent = new Event()
+        require(['jquery', 'underscore', 'brix/event'], function($, _, EventManager) {
+            var manager = new EventManager('bx-')
             // 定义宿主对象，可以是任意对象
             var owner = {
                 foo: function(event, arg) {
@@ -43,12 +43,10 @@
             }
             // 指定目标容器节点
             var target = $('#target')
-            // 绑定 Event 的方法至宿主对象
-            _.extend(owner, BXEvent)
             // 绑定
-            owner.delegateBxTypeEvents( target )
+            manager.delegate(target, owner)
             // 移除
-            // owner.undelegateBxTypeEvents( target )
+            // manager.undelegate( target )
         })
     </script>
 

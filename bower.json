@@ -1,6 +1,9 @@
 {
   "name": "brix-event",
   "version": "0.0.5",
+  "main": [
+    "dist/event.js"
+  ],
   "ignore": [
     "**/.*"
   ],

@@ -3,9 +3,10 @@ var gulp = require('gulp')
 var jshint = require('gulp-jshint')
 var rjs = require('gulp-requirejs')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
+var exec = require('child_process').exec
 
 var globs = ['src/**/*.js', 'test/*.js', 'gulpfile.js']
-var watchTasks = ['hello', 'jshint', 'rjs', 'test']
+var watchTasks = ['hello', 'madge', 'jshint', 'rjs', 'test']
 
 gulp.task('hello', function() {
     console.log((function() {
@@ -54,6 +55,22 @@ gulp.task('test', function() {
         .pipe(mochaPhantomJS({
             reporter: 'spec'
         }))
+})
+
+// https://github.com/pahen/madge
+gulp.task('madge', function( /*callback*/ ) {
+    exec('madge --format amd ./src/',
+        function(error, stdout /*, stderr*/ ) {
+            if (error) console.log('exec error: ' + error)
+            console.log('module dependencies:')
+            console.log(stdout)
+        }
+    )
+    exec('madge --format amd --image ./doc/dependencies.png ./src/',
+        function(error /*, stdout, stderr*/ ) {
+            if (error) console.log('exec error: ' + error)
+        }
+    )
 })
 
 gulp.task('default', watchTasks.concat(['watch']))

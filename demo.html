@@ -69,11 +69,12 @@
             }
             // 绑定
             manager.delegate( $('#target'), owner1 )
+            manager.delegate( $('#target'), owner1 )
             manager.delegate( $('#target22'), owner2 )
-            // BXEvent.delegateBxTypeEvents( target, owner )
+            manager.delegate( $('#target22'), owner2 )
             // 移除
-            // BXEvent.undelegateBxTypeEvents( $('#target') )
-            // BXEvent.undelegateBxTypeEvents( $('#target22') )
+            // manager.undelegate( $('#target') )
+            // manager.undelegate( $('#target22') )
         })
     </script>
 

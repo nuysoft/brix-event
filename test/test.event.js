@@ -29,42 +29,43 @@ describe('Event', function() {
     this.timeout(1000)
 
     var expect = chai.expect
-    var $, _, Event, BXEvent
+    var $, _, EventManager, manager
     var container
     var prefix = 'bx-'
 
     var types = ('blur focus focusin focusout load resize scroll unload click dblclick ' +
-        'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
-        'change select submit keydown keypress keyup contextmenu').split(' ') // error 
+            'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
+            'change select submit keydown keypress keyup contextmenu').split(' ') // error 
     var tpl = '<div bx-<%= type %>="<%= type %>Handle( <%= index %> )"></div>'
 
     before(function(done) {
         require(['jquery', 'underscore', 'brix/event'], function() {
             $ = arguments[0]
             _ = arguments[1]
-            Event = arguments[2]
-            BXEvent = Event()
+            EventManager = arguments[2]
+            manager = EventManager('bx-')
             container = $('#container')
 
             expect($).to.not.equal(undefined)
             expect(_).to.not.equal(undefined)
-            expect(Event).to.not.equal(undefined)
+            expect(EventManager).to.not.equal(undefined)
+            expect(manager).to.not.equal(undefined)
 
             done()
         })
     })
 
-    describe('Event._parseMethodAndParams( handler )', function() {
+    describe('EventManager._parseMethodAndParams( handler )', function() {
         var handler
         it('foo()', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.deep.equal({
                 method: 'foo',
                 params: []
             })
         })
         it('foo( Math.random() )', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
@@ -73,7 +74,7 @@ describe('Event', function() {
                 .that.be.a('number').within(0, 1)
         })
         it('foo( Math.random(), Math.random() )', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
@@ -84,7 +85,7 @@ describe('Event', function() {
                 .that.within(0, 1)
         })
         it('foo( 42, "42" )', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
@@ -95,7 +96,7 @@ describe('Event', function() {
                 .that.be.a('string').equal('42')
         })
         it('foo( { 42: 42 }, [ 42 ] )', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
@@ -108,7 +109,7 @@ describe('Event', function() {
                 .that.be.an('array').deep.equal([42])
         })
         it('foo( 42 + 42, "42" + "42" )', function() {
-            handler = Event._parseMethodAndParams(this.test.title)
+            handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
@@ -116,15 +117,16 @@ describe('Event', function() {
             expect(handler).to.have.deep.property('params[0]')
                 .that.be.a('number').equal(42 + 42)
             expect(handler).to.have.deep.property('params[1]')
-                .that.be.an('string').equal('4242')
+                .that.be.an('string').equal('42' + '42')
         })
     })
 
-    describe('Event._parseBxEvents( prefix, element )', function() {
+    describe('EventManager._parseBxEvents( prefix, element )', function() {
         it('<div bx-click="foo( 42, \'42\' )"></div>', function(done) {
-            var bxEvents = Event._parseBxEvents(prefix, $(this.test.title))
+            var bxEvents = EventManager._parseBxEvents(prefix, $(this.test.title))
             expect(bxEvents).to.be.an('array').with.length(1)
             _.each(bxEvents, function(bxEvent /*, index*/ ) {
+                // target type handler method params
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type', 'click')
@@ -136,9 +138,10 @@ describe('Event', function() {
             done()
         })
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
-            var bxEvents = Event._parseBxEvents(prefix, $(this.test.title))
+            var bxEvents = EventManager._parseBxEvents(prefix, $(this.test.title))
             expect(bxEvents).to.be.an('array').with.length(4)
             _.each(bxEvents, function(bxEvent /*, index*/ ) {
+                // target type handler method params
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -151,9 +154,10 @@ describe('Event', function() {
             done()
         })
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
-            var bxEvents = Event._parseBxEvents(prefix, $(this.test.title + this.test.title + this.test.title))
+            var bxEvents = EventManager._parseBxEvents(prefix, $(this.test.title + this.test.title + this.test.title))
             expect(bxEvents).to.be.an('array').with.length(12)
             _.each(bxEvents, function(bxEvent /*, index*/ ) {
+                // target type handler method params
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -166,7 +170,7 @@ describe('Event', function() {
             done()
         })
     })
-    describe('Event._parseBxEvents( prefix, element, deep )', function() {
+    describe('EventManager._parseBxEvents( prefix, element ) Nested', function() {
         it('nested bx-type', function(done) {
             var element, html
             _.map(types, function(type, index) {
@@ -178,9 +182,10 @@ describe('Event', function() {
                 else element = $(html).appendTo(element)
             })
 
-            var bxEvents = Event._parseBxEvents(prefix, container, true)
+            var bxEvents = EventManager._parseBxEvents(prefix, container)
             expect(bxEvents).to.be.an('array').with.length(types.length)
             _.each(bxEvents, function(bxEvent, index) {
+                // target type handler method params
                 expect(bxEvent).to.have.property('target')
                     .that.have.property('nodeType')
                 expect(bxEvent).to.have.property('type')
@@ -205,7 +210,7 @@ describe('Event', function() {
                 else element = $(html).appendTo(element[index % 3])
             })
 
-            var bxEvents = Event._parseBxEvents(prefix, container, true)
+            var bxEvents = EventManager._parseBxEvents(prefix, container)
             expect(bxEvents).to.be.an('array').with.length(types.length * 3)
             _.each(bxEvents, function(bxEvent /*, index*/ ) {
                 expect(bxEvent).to.have.property('target')
@@ -224,21 +229,25 @@ describe('Event', function() {
             done()
         })
     })
-    describe('Event._parseBxTypes( prefix, element )', function() {
+    describe('EventManager._parseBxTypes( prefix, element )', function() {
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
-            var bxTypes = Event._parseBxTypes(prefix, $(this.test.title))
+            var bxTypes = EventManager._parseBxTypes(prefix, $(this.test.title))
             expect(bxTypes).to.be.an('array').with.length(4)
                 .that.deep.equal(['blur', 'focus', 'focusin', 'focusout'])
             done()
         })
         it('<div bx-blur="blurHandle" bx-focus="focusHandle" bx-focusin="focusinHandle" bx-focusout="focusoutHandle"></div>', function(done) {
-            var bxTypes = Event._parseBxTypes(prefix, $(this.test.title + this.test.title + this.test.title))
+            var bxTypes = EventManager._parseBxTypes(prefix, $(this.test.title + this.test.title + this.test.title))
             expect(bxTypes).to.be.an('array').with.length(4)
                 .that.deep.equal(['blur', 'focus', 'focusin', 'focusout'])
             done()
         })
     })
-    describe('Event._parseBxTypes( prefix, element, deep )', function() {
+    describe('EventManager._parseBxTypes( prefix, element, deep )', function() {
+        afterEach(function(done) {
+            container.empty()
+            done()
+        })
         it('nested bx-type', function(done) {
             var element, html
             _.map(types, function(type, index) {
@@ -250,11 +259,10 @@ describe('Event', function() {
                 else element = $(html).appendTo(element)
             })
 
-            var bxTypes = Event._parseBxTypes(prefix, container, true)
+            var bxTypes = EventManager._parseBxTypes(prefix, container, true)
             expect(bxTypes).to.be.an('array').with.length(types.length)
                 .that.deep.equal(types.sort())
 
-            container.empty()
             done()
         })
         it('nested bx-type x3', function(done) {
@@ -268,16 +276,15 @@ describe('Event', function() {
                 else element = $(html).appendTo(element[index % 3])
             })
 
-            var bxTypes = Event._parseBxTypes(prefix, container, true)
+            var bxTypes = EventManager._parseBxTypes(prefix, container, true)
             expect(bxTypes).to.be.an('array').with.length(types.length)
                 .that.deep.equal(types.sort())
 
-            container.empty()
             done()
         })
     })
 
-    describe('Event._delegateBxTypeEvents( prefix, element, owner )', function() {
+    describe('EventManager._delegateBxTypeEvents( prefix, element, owner )', function() {
         beforeEach(function(done) {
             container.html('<div bx-click="foo( 42, \'43\', 44 )">hello</div>')
             done()
@@ -297,7 +304,7 @@ describe('Event', function() {
                 }
             }
             var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, $element, owner)
+            EventManager._delegateBxTypeEvents(prefix, $element, owner)
             $element.trigger('click')
         })
         it('$element.trigger( extraParameter )', function(done) {
@@ -312,7 +319,7 @@ describe('Event', function() {
                 }
             }
             var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, $element, owner)
+            EventManager._delegateBxTypeEvents(prefix, $element, owner)
             $element.trigger('click', 41)
         })
         it('$element.trigger( [ extraParameter, extraParameter ] )', function(done) {
@@ -328,7 +335,7 @@ describe('Event', function() {
                 }
             }
             var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, $element, owner)
+            EventManager._delegateBxTypeEvents(prefix, $element, owner)
             $element.trigger('click', [40, '41'])
         })
         it('$element.click()', function(done) {
@@ -342,7 +349,7 @@ describe('Event', function() {
                 }
             }
             var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, $element, owner)
+            EventManager._delegateBxTypeEvents(prefix, $element, owner)
             $element.click()
         })
         it('element.click()', function(done) {
@@ -356,105 +363,19 @@ describe('Event', function() {
                 }
             }
             var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, $element[0], owner)
+            EventManager._delegateBxTypeEvents(prefix, $element[0], owner)
             if ($element[0].click) $element[0].click()
             else $element.click()
         })
     })
 
-    describe('Event._delegateBxTypeEvents( prefix, owner, element, deep )', function() {
-        beforeEach(function(done) {
-            container.html('<div bx-click="foo( 42, \'43\', 44 )">hello</div>')
-            done()
-        })
-        afterEach(function(done) {
-            Event._undelegateBxTypeEvents(prefix, container, true)
-            container.empty()
-            done()
-        })
-        it('$element.trigger()', function(done) {
-            var owner = {
-                foo: function(event, arg1, arg2, arg3) {
-                    expect(event).to.have.property('type', 'click')
-                    expect(arg1).to.equal(42)
-                    expect(arg2).to.equal('43')
-                    expect(arg3).to.equal(44)
-                    done()
-                }
-            }
-            var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
-            $element.trigger('click')
-        })
-        it('$element.trigger( extraParameter )', function(done) {
-            var owner = {
-                foo: function(event, arg1, arg2, arg3, arg4) {
-                    expect(event).to.have.property('type', 'click')
-                    expect(arg1).to.equal(41)
-                    expect(arg2).to.equal(42)
-                    expect(arg3).to.equal('43')
-                    expect(arg4).to.equal(44)
-                    done()
-                }
-            }
-            var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
-            $element.trigger('click', 41)
-        })
-        it('$element.trigger( [ extraParameter, extraParameter ] )', function(done) {
-            var owner = {
-                foo: function(event, arg1, arg2, arg3, arg4, arg5) {
-                    expect(event).to.have.property('type', 'click')
-                    expect(arg1).to.equal(40)
-                    expect(arg2).to.equal('41')
-                    expect(arg3).to.equal(42)
-                    expect(arg4).to.equal('43')
-                    expect(arg5).to.equal(44)
-                    done()
-                }
-            }
-            var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
-            $element.trigger('click', [40, '41'])
-        })
-        it('$element.click()', function(done) {
-            var owner = {
-                foo: function(event, arg1, arg2, arg3) {
-                    expect(event).to.have.property('type', 'click')
-                    expect(arg1).to.equal(42)
-                    expect(arg2).to.equal('43')
-                    expect(arg3).to.equal(44)
-                    done()
-                }
-            }
-            var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
-            $element.click()
-        })
-        it('element.click()', function(done) {
-            var owner = {
-                foo: function(event, arg1, arg2, arg3) {
-                    expect(event).to.have.property('type', 'click')
-                    expect(arg1).to.equal(42)
-                    expect(arg2).to.equal('43')
-                    expect(arg3).to.equal(44)
-                    done()
-                }
-            }
-            var $element = container.find('div')
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
-            if ($element[0].click) $element[0].click()
-            else $element.click()
-        })
-    })
-
-    describe('Event._delegateBxTypeEvents( owner, element, deep ) Nested', function() {
+    describe('EventManager._delegateBxTypeEvents( prefix, owner, element ) Nested', function() {
         beforeEach(function(done) {
             container.empty()
             done()
         })
         afterEach(function(done) {
-            Event._undelegateBxTypeEvents(prefix, container, true)
+            EventManager._undelegateBxTypeEvents(prefix, container, true)
             container.empty()
             done()
         })
@@ -478,7 +399,7 @@ describe('Event', function() {
                 }
             })
 
-            Event._delegateBxTypeEvents(prefix, container, owner, true)
+            EventManager._delegateBxTypeEvents(prefix, container, owner)
 
             _.each(types, function(type /*, index*/ ) {
                 $('[bx-' + type + ']', container).trigger(type)
@@ -489,7 +410,50 @@ describe('Event', function() {
         })
     })
 
-    describe('Owner.delegateBxTypeEvents()', function() {
+    describe('manager.delegate( element, owner )', function() {
+        beforeEach(function(done) {
+            container.empty()
+            done()
+        })
+        afterEach(function(done) {
+            container.empty()
+            done()
+        })
+        it(types, function(done) {
+            var element, html
+            _.map(types, function(type, index) {
+                html = _.template(tpl)({
+                    type: type,
+                    index: index
+                })
+                if (index === 0) container.append(element = $(html))
+                else element = $(html).appendTo(element)
+            })
+
+            var owner = {
+                answer: 42
+            }
+            _.each(types, function(type, index) {
+                owner[type + 'Handle'] = function(event, arg) {
+                    expect(event.type).to.equal(type)
+                    expect(arg).to.equal(index)
+                    expect(this.answer).to.equal(42)
+                }
+            })
+
+            manager.delegate(container, owner)
+
+            _.each(types, function(type /*, index*/ ) {
+                $('[bx-' + type + ']', container).trigger(type)
+            })
+
+            manager.undelegate(container)
+
+            done()
+        })
+    })
+
+    describe('manager.delegate( element, owner ) Redelegate', function() {
         beforeEach(function(done) {
             container.empty()
             done()
@@ -510,64 +474,18 @@ describe('Event', function() {
                 else element = $(html).appendTo(element)
             })
 
-            var owner = _.extend({
-                answer: 42,
-                element: container
-            }, BXEvent)
+            var owner = {
+                answer: 42
+            }
             _.each(types, function(type, index) {
                 owner[type + 'Handle'] = function(event, arg) {
                     expect(event.type).to.equal(type)
                     expect(arg).to.equal(index)
-                    if (event.type === 'error') event.stopPropagation()
+                    expect(this.answer).to.equal(42)
                 }
             })
 
-            owner.delegateBxTypeEvents()
-
-            _.each(types, function(type /*, index*/ ) {
-                $('[bx-' + type + ']', container).trigger(type)
-            })
-
-            owner.undelegateBxTypeEvents()
-
-            done()
-        })
-    })
-
-    describe('Owner.delegateBxTypeEvents() Redelegate', function() {
-        beforeEach(function(done) {
-            container.empty()
-            done()
-        })
-        afterEach(function(done) {
-            container.empty()
-            done()
-        })
-
-        it(types, function(done) {
-            var element, html
-            _.map(types, function(type, index) {
-                html = _.template(tpl)({
-                    type: type,
-                    index: index
-                })
-                if (index === 0) container.append(element = $(html))
-                else element = $(html).appendTo(element)
-            })
-
-            var owner = _.extend({
-                answer: 42,
-                element: container
-            }, BXEvent)
-            _.each(types, function(type, index) {
-                owner[type + 'Handle'] = function(event, arg) {
-                    expect(event.type).to.equal(type)
-                    expect(arg).to.equal(index)
-                    if (event.type === 'error') event.stopPropagation()
-                }
-            })
-
-            owner.delegateBxTypeEvents()
+            manager.delegate(container, owner)
 
             container.empty()
             _.map(types, function(type, index) {
@@ -579,13 +497,13 @@ describe('Event', function() {
                 else element = $(html).appendTo(element)
             })
 
-            owner.delegateBxTypeEvents()
+            manager.delegate(container, owner)
 
             _.each(types, function(type /*, index*/ ) {
                 $('[bx-' + type + ']', container).trigger(type)
             })
 
-            owner.undelegateBxTypeEvents()
+            manager.undelegate(container)
 
             done()
         })
@@ -608,15 +526,13 @@ describe('Event', function() {
                     done()
                 }
             }
-            _.extend(owner, BXEvent)
-            owner.delegateBxTypeEvents()
-            owner.element.find('div').click()
-            owner.undelegateBxTypeEvents()
+            manager.delegate(container, owner)
+            container.find('div').click()
+            manager.undelegate(container)
         })
         it('<div bx-document-click="foo( 43, \'43\' )">hello</div>', function(done) {
             container.html(this.test.title)
             var owner = {
-                element: container,
                 foo: function(event, arg1, arg2) {
                     expect(event.type).to.equal('click')
                     expect(arg1).to.equal(43)
@@ -624,33 +540,27 @@ describe('Event', function() {
                     done()
                 }
             }
-            _.extend(owner, BXEvent)
-            owner.delegateBxTypeEvents()
-            owner.element.find('div').click()
-            owner.undelegateBxTypeEvents()
+            manager.delegate(container, owner)
+            container.find('div').click()
+            manager.undelegate(container)
         })
         it('<div bx-window-click="foo( 44, \'44\' )">hello</div>', function(done) {
             container.html(this.test.title)
             var owner = {
-                element: container,
                 foo: function(event, arg1, arg2) {
                     expect(event.type).to.equal('click')
                     expect(arg1).to.equal(44)
                     expect(arg2).to.equal('44')
-                        // setTimeout( done, 35 )
                     done()
                 }
             }
-            _.extend(owner, BXEvent)
-            owner.delegateBxTypeEvents()
-            owner.element.find('div').click()
-            owner.undelegateBxTypeEvents()
+            manager.delegate(container, owner)
+            container.find('div').click()
+            manager.undelegate(container)
         })
     })
 
     // TODO
-    describe('prefix-type', function() {
-
-    })
+    // describe('prefix-type', function() {})
 
 })
