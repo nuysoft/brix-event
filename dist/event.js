@@ -52,12 +52,16 @@ define(
                 console.timeEnd(label)
                 console.groupEnd(label)
             }
+
+            return this
         }
 
         // 从节点 `element` 上移除 `bx-type` 风格的事件监听函数。
         EventManager.prototype.undelegate = function(element) {
             element = element || document.body
             _undelegateBxTypeEvents(this.prefix, element)
+
+            return this
         }
 
         // 工具方法
@@ -84,6 +88,8 @@ define(
             var $element = jQuery(element)
             var data = $element.data()
 
+            if (!data) return
+                
             data[BX_EVENT_SEPARATION] = Math.random()
             if (!data[BX_EVENT_CACHE]) data[BX_EVENT_CACHE] = {}
 
@@ -164,6 +170,8 @@ define(
             var $body = jQuery(document.body)
             var $element = jQuery(element)
             var data = $element.data()
+
+            if (!data) return
 
             /* jshint unused:false */
             _.each(data[BX_EVENT_CACHE], function(item, bxtype) {
