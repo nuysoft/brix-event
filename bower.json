@@ -5,7 +5,15 @@
     "dist/event.js"
   ],
   "ignore": [
-    "**/.*"
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src",
+    "test",
+    "doc",
+    "demo.html",
+    "package.json",
+    "gulpfile.js"
   ],
   "dependencies": {
     "jquery": "1.x.x",
