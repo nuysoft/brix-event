@@ -89,9 +89,9 @@ define(
             var data = $element.data()
 
             if (!data) return
-                
-            data[BX_EVENT_SEPARATION] = Math.random()
-            if (!data[BX_EVENT_CACHE]) data[BX_EVENT_CACHE] = {}
+
+            data[BX_EVENT_SEPARATION + prefix] = Math.random()
+            if (!data[BX_EVENT_CACHE + prefix]) data[BX_EVENT_CACHE + prefix] = {}
 
             var types = _parseBxTypes(prefix, element)
             _.each(types, function(type /*, index*/ ) {
@@ -99,7 +99,7 @@ define(
                 var selector = '[' + bxtype + ']' // [bx-type]
 
                 // 已经代理过该类型的事件，无需再次代理
-                if (data[BX_EVENT_CACHE][bxtype]) return
+                if (data[BX_EVENT_CACHE + prefix][bxtype]) return
 
                 if (DEBUG) {
                     console.log(DEBUG.fix(type, 16), bxtype)
@@ -115,7 +115,7 @@ define(
                 $body.on(type + BX_EVENT_NAMESPACE, selector, appetizer)
 
                 // 记录开胃菜 appetizer()，用于将来移除
-                data[BX_EVENT_CACHE][bxtype] = {
+                data[BX_EVENT_CACHE + prefix][bxtype] = {
                     type: type,
                     bxtype: bxtype,
                     namespace: BX_EVENT_NAMESPACE,
@@ -126,7 +126,7 @@ define(
                 // 开胃菜
                 function appetizer(event) {
                     if (jQuery(event.target).closest('.disabled').length) return
-                    if (closestSeparation(event.currentTarget) !== data[BX_EVENT_SEPARATION]) return
+                    if (closestSeparation(prefix, event.currentTarget) !== data[BX_EVENT_SEPARATION + prefix]) return
 
                     var extraParameters = [].slice.call(arguments, 1)
                     entrees.apply(this, [event, owner, prefix].concat(extraParameters))
@@ -152,13 +152,13 @@ define(
             }
         }
 
-        function closestSeparation(element) {
-            var separation = jQuery(element).data(BX_EVENT_SEPARATION)
+        function closestSeparation(prefix, element) {
+            var separation = jQuery(element).data(BX_EVENT_SEPARATION + prefix)
             if (!separation) {
                 var parents = jQuery(element).parents()
                 for (var i = 0; i < parents.length; i++) {
-                    if (parents.eq(i).data(BX_EVENT_SEPARATION)) {
-                        separation = parents.eq(i).data(BX_EVENT_SEPARATION)
+                    if (parents.eq(i).data(BX_EVENT_SEPARATION + prefix)) {
+                        separation = parents.eq(i).data(BX_EVENT_SEPARATION + prefix)
                         break
                     }
                 }
@@ -174,7 +174,7 @@ define(
             if (!data) return
 
             /* jshint unused:false */
-            _.each(data[BX_EVENT_CACHE], function(item, bxtype) {
+            _.each(data[BX_EVENT_CACHE + prefix], function(item, bxtype) {
                 RE_TARGET_TYPE.exec('')
                 if (RE_TARGET_TYPE.exec(item.type)) {
                     _undelegateBxTargetTypeEvents(prefix, item.type, element)
@@ -182,7 +182,7 @@ define(
                 }
                 $body.off(item.type + item.namespace, item.selector, item.appetizer)
             })
-            data[BX_EVENT_CACHE] = {}
+            data[BX_EVENT_CACHE + prefix] = {}
         }
 
         // 在指定的节点上绑定事件
@@ -364,7 +364,7 @@ define(
                     params = eval('(function(){ return [].splice.call(arguments, 0 ) })(' + params + ')')
                 } catch (error) {
                     // 2. 如果失败，只能解析为字符串
-                    params = parts[2].split(/,\s*/)
+                    params = params.split(/,\s*/)
                 }
                 return {
                     method: method,

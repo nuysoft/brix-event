@@ -26,7 +26,7 @@
     <div id="target" style="margin: 60px 50px;">
         <span>owner1</span>
         <ul>
-            <li bx-click="foo(1)">1</li>
+            <li bx-click="foo(1)" mx-click="foo(1)">1</li>
             <li bx-click="foo(2)">
                 <span>2</span>
                 <ul>
@@ -48,6 +48,7 @@
         require(['jquery', 'underscore', 'brix/event'], function($, _, EventManager) {
             // 定义事件管理器
             var manager = new EventManager('bx-')
+            var mxManager = new EventManager('mx-')
             // 定义宿主对象，可以是任意对象
             var owner1 = {
                 foo: function(event, arg) {
@@ -72,6 +73,7 @@
             manager.delegate( $('#target'), owner1 )
             manager.delegate( $('#target22'), owner2 )
             manager.delegate( $('#target22'), owner2 )
+            mxManager.delegate( $('#target'), owner1 )
             // 移除
             // manager.undelegate( $('#target') )
             // manager.undelegate( $('#target22') )
