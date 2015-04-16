@@ -32,6 +32,7 @@ define(
             }
             this.prefix = prefix || PREFIX
         }
+        EventManager.NAMESPACE = BX_EVENT_NAMESPACE
 
         // 在节点 `element` 上代理 `bx-type` 风格的事件监听函数，事件监听函数定义在宿主对象 `owner` 中。
         EventManager.prototype.delegate = function(element, owner) {
