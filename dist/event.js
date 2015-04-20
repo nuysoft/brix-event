@@ -295,9 +295,20 @@ define(
                 return events
             }
 
-            var elements = [element].concat(
-                [].slice.call(element.getElementsByTagName('*'), 0)
-            )
+            var elements = function() {
+                /*
+                    “Array.prototype.slice: 'this' is not a JavaScript object” error in IE8
+                    var elements = [element].concat(
+                        [].slice.call(element.getElementsByTagName('*'), 0)
+                    )
+                 */
+                var elements = [element]
+                var all = element.getElementsByTagName('*')
+                for (var i = 0; i < all.length; i++) {
+                    elements.push(all[i])
+                }
+                return elements
+            }()
             _.each(elements, function(item /*, index*/ ) {
                 _.each(item.attributes, function(attribute) {
                     RE_BX_TYPE.exec('') // reset lastIndex to 0
