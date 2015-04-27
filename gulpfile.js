@@ -37,7 +37,8 @@ gulp.task('rjs', function() {
         out: 'dist/event.js',
         paths: {
             jquery: 'empty:',
-            underscore: 'empty:'
+            underscore: 'empty:',
+            'brix/loader': 'empty:',
         }
     }
     rjs(build)

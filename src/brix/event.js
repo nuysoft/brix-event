@@ -2,10 +2,12 @@
 /* global window, document, location, console */
 define(
     [
-        'jquery', 'underscore'
+        'jquery', 'underscore',
+        'brix/loader'
     ],
     function(
-        jQuery, _
+        jQuery, _,
+        Loader
     ) {
 
         var DEBUG = ~location.search.indexOf('brix.event.debug') && {
@@ -129,6 +131,11 @@ define(
                     if (closestSeparation(prefix, event.currentTarget) !== data[BX_EVENT_SEPARATION + prefix]) return
 
                     var extraParameters = [].slice.call(arguments, 1)
+                    event.owner = owner
+                    event.component = function() {
+                        var component = Loader.query(event.currentTarget)
+                        if (component.length) return component[0]
+                    }()
                     entrees.apply(this, [event, owner, prefix].concat(extraParameters))
                 }
             })

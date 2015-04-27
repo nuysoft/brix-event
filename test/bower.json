@@ -6,6 +6,7 @@
     "mocha": "*",
     "chai": "*",
     "underscore": "*",
-    "jquery": "*"
+    "jquery": "*",
+    "brix-loader": "master"
   }
 }
