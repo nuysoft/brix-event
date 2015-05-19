@@ -381,9 +381,17 @@ define(
                     // 1. 尝试保持参数的类型 
                     /* jshint evil: true */
                     params = eval('(function(){ return [].splice.call(arguments, 0 ) })(' + params + ')')
+
                 } catch (error) {
-                    // 2. 如果失败，只能解析为字符串
-                    params = params.split(/,\s*/)
+                    // fuck ie8
+                    try {
+                        /* jshint evil: true */
+                        params = eval('(function(){ var result = []; for(var i = 0; i < arguments.length; i++ ) { result.push(arguments[i]) } return result })(' + params + ')')
+
+                    } catch (error) {
+                        // 2. 如果失败，只能解析为字符串
+                        params = params.split(/,\s*/)
+                    }
                 }
                 return {
                     method: method,

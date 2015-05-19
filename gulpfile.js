@@ -1,5 +1,6 @@
 /* global require, console */
 var gulp = require('gulp')
+var connect = require('gulp-connect')
 var jshint = require('gulp-jshint')
 var rjs = require('gulp-requirejs')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
@@ -19,6 +20,23 @@ ______        _         _____                    _
 \____/ |_|   |_|/_/\_\ \____/  \_/  \___||_| |_| \__|
         */
     }).toString().split('\n').slice(2, -2).join('\n') + '\n')
+})
+
+// https://github.com/AveVlad/gulp-connect
+gulp.task('connect', function() {
+    connect.server({
+        port: 4246,
+        middleware: function( /*connect, opt*/ ) {
+            return [
+                // https://github.com/senchalabs/connect/#use-middleware
+                /* jshint unused:true */
+                function cors(req, res, next) {
+                    if (req.method === 'POST') req.method = 'GET'
+                    next()
+                }
+            ]
+        }
+    })
 })
 
 // https://github.com/spenceralger/gulp-jshint
