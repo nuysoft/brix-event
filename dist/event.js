@@ -1,14 +1,12 @@
 
-/* global define */
+/* global require, define */
 /* global window, document, location, console */
 define(
     'brix/event',[
-        'jquery', 'underscore',
-        'brix/loader'
+        'jquery', 'underscore'
     ],
     function(
-        jQuery, _,
-        Loader
+        jQuery, _
     ) {
 
         var DEBUG = ~location.search.indexOf('brix.event.debug') && {
@@ -134,8 +132,10 @@ define(
                     var extraParameters = [].slice.call(arguments, 1)
                     event.owner = owner
                     event.component = function() {
-                        var component = Loader.query(event.currentTarget)
-                        if (component.length) return component[0]
+                        try {
+                            // 尝试获取节点关联的组件实例
+                            return require('brix/loader').query(event.currentTarget)[0]
+                        } catch (error) {}
                     }()
                     entrees.apply(this, [event, owner, prefix].concat(extraParameters))
                 }
@@ -382,13 +382,13 @@ define(
                     /* jshint evil: true */
                     params = eval('(function(){ return [].splice.call(arguments, 0, arguments.length) })(' + params + ')')
 
-                } catch (error) {
+                } catch (error1) {
                     // fuck ie8
                     try {
                         /* jshint evil: true */
                         params = eval('(function(){ var result = []; for(var i = 0; i < arguments.length; i++ ) { result.push(arguments[i]) } return result })(' + params + ')')
 
-                    } catch (error) {
+                    } catch (error2) {
                         // 2. 如果失败，只能解析为字符串
                         params = params.split(/,\s*/)
                     }
