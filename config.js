@@ -1,5 +1,5 @@
 require.config({
 	paths: {
-		'base':'/brix-base/src/'
+		'brix/event':'./dist/event'
 	}
 })
