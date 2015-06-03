@@ -380,7 +380,7 @@ define(
                 try {
                     // 1. 尝试保持参数的类型 
                     /* jshint evil: true */
-                    params = eval('(function(){ return [].splice.call(arguments, 0, arguments.length) })(' + params + ')')
+                    params = eval('(function(){ return Array.prototype.slice.call(arguments) })(' + params + ')')
 
                 } catch (error1) {
                     // fuck ie8
