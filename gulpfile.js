@@ -1,13 +1,15 @@
 /* global require, console */
 var gulp = require('gulp')
+var through = require('through2')
 var connect = require('gulp-connect')
 var jshint = require('gulp-jshint')
 var rjs = require('gulp-requirejs')
+var uglify = require('gulp-uglify')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
 var exec = require('child_process').exec
 
 var globs = ['src/**/*.js', 'test/*.js', 'gulpfile.js']
-var watchTasks = ['hello', 'madge', 'jshint', 'rjs', 'test']
+var watchTasks = ['hello', 'madge', 'jshint', 'rjs', 'compress', 'test']
 
 gulp.task('hello', function() {
     console.log((function() {
@@ -55,8 +57,7 @@ gulp.task('rjs', function() {
         out: 'dist/event.js',
         paths: {
             jquery: 'empty:',
-            underscore: 'empty:',
-            'brix/loader': 'empty:',
+            underscore: 'empty:'
         }
     }
     rjs(build)
@@ -74,6 +75,22 @@ gulp.task('test', function() {
         .pipe(mochaPhantomJS({
             reporter: 'spec'
         }))
+})
+
+// https://github.com/terinjokes/gulp-uglify
+gulp.task('compress', function() {
+    gulp.src(['dist/**.js','!dist/**-debug.js'])
+        .pipe(through.obj(function(file, encoding, callback) { /* jshint unused:false */
+            file.path = file.path.replace(
+                '.js',
+                '-debug.js'
+            )
+            callback(null, file)
+        }))
+        .pipe(gulp.dest('dist/'))
+    gulp.src(['dist/**.js','!dist/**-debug.js'])
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/'))
 })
 
 // https://github.com/pahen/madge
