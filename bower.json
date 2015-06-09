@@ -17,8 +17,7 @@
   ],
   "dependencies": {
     "jquery": "1.x.x",
-    "underscore": "*",
-    "brix-loader": "master"
+    "underscore": "*"
   },
   "devDependencies": {}
 }
