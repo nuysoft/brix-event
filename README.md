@@ -31,9 +31,9 @@ require.config({
 ```js
 // 使用 Brix Event
 require(['jquery', 'brix/event'], function($, EventManager) {
-    // 定义事件管理器
+    // 创建事件管理器
     var manager = new EventManager('bx-')
-    // 定义宿主对象，可以是任意对象
+    // 创建宿主对象，可以是任意对象
     var owner = {
         foo: function(event, arg) {
             console.log(this, this === owner) // this, true
@@ -127,7 +127,7 @@ manager.delegate( $('#container'), owner )
 
 在上面的代码中，有几点改进之处可以借鉴：
 
-首先，通过增加语义化的名称 `changeDate`，会使代码更加容易阅读和查找。
+首先，通过增加语义化的名称 `changeDate`，会使代码更加容易阅读和查找；参数 `-1` 和 `1` 直接以函数调用的方式写在 HTML 中，传参方式更加方便和直观。
 
 其次，方法 `changeDate` 合并了相似的代码。这种方式使得提升代码复用性更加容易。
 

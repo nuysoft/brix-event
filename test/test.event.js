@@ -63,6 +63,8 @@ describe('Event', function() {
                 method: 'foo',
                 params: []
             })
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
         it('foo( Math.random() )', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
@@ -72,6 +74,8 @@ describe('Event', function() {
                 .that.be.an('array').with.length(1)
             expect(handler).to.have.deep.property('params[0]')
                 .that.be.a('number').within(0, 1)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
         it('foo( Math.random(), Math.random() )', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
@@ -83,6 +87,8 @@ describe('Event', function() {
                 .that.within(0, 1)
             expect(handler).to.with.deep.property('params[1]')
                 .that.within(0, 1)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
         it('foo( 42, "42" )', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
@@ -94,6 +100,8 @@ describe('Event', function() {
                 .that.be.a('number').equal(42)
             expect(handler).to.have.deep.property('params[1]')
                 .that.be.a('string').equal('42')
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
         it('foo( { 42: 42 }, [ 42 ] )', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
@@ -107,6 +115,8 @@ describe('Event', function() {
                 })
             expect(handler).to.have.deep.property('params[1]')
                 .that.be.an('array').deep.equal([42])
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
         it('foo( 42 + 42, "42" + "42" )', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
@@ -117,7 +127,99 @@ describe('Event', function() {
             expect(handler).to.have.deep.property('params[0]')
                 .that.be.a('number').equal(42 + 42)
             expect(handler).to.have.deep.property('params[1]')
-                .that.be.an('string').equal('42' + '42')
+                .that.be.a('string').equal('42' + '42')
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+
+        // 特殊情况：参数是 0 false '' undefined null
+        it('foo(0)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(1)
+            expect(handler.params[0]).to.be.equal(0)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(false)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(1)
+            expect(handler.params[0]).to.be.equal(false)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(undefined)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(1)
+            expect(handler.params[0]).to.be.equal(undefined)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(null)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(1)
+            expect(handler.params[0]).to.be.equal(null)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo("")', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(1)
+            expect(handler.params[0]).to.be.equal('')
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+
+        // 特殊情况：参数格式不完整
+        it('foo(,42)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(2)
+            expect(handler.params[0]).to.be.equal(undefined)
+            expect(handler).to.have.deep.property('params[1]')
+                .that.be.a('number').equal(42)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(,42,)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(2)
+            expect(handler.params[0]).to.be.equal(undefined)
+            expect(handler).to.have.deep.property('params[1]')
+                .that.be.a('number').equal(42)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(,,,)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(3)
+            expect(handler.params[0]).to.be.equal(undefined)
+            expect(handler.params[1]).to.be.equal(undefined)
+            expect(handler.params[2]).to.be.equal(undefined)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
         })
     })
 
