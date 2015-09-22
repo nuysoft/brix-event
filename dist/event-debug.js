@@ -375,10 +375,27 @@ define(
             var method
             var params
             if (parts && parts[1]) {
-                return {
-                    method: parts[1],
+                method = parts[1]
+                params = parts[2] || ''
+                try {
+                    // 1. 尝试保持参数的类型 
                     /* jshint evil: true */
-                    params: eval('[' + (parts[2] || '') + ']')
+                    params = eval('(function(){ return Array.prototype.slice.call(arguments) })(' + params + ')')
+
+                } catch (error1) {
+                    // fuck ie8
+                    try {
+                        /* jshint evil: true */
+                        params = eval('(function(){ var result = []; for(var i = 0; i < arguments.length; i++ ) { result.push(arguments[i]) } return result })(' + params + ')')
+
+                    } catch (error2) {
+                        // 2. 如果失败，只能解析为字符串
+                        params = params.split(/,\s*/)
+                    }
+                }
+                return {
+                    method: method,
+                    params: params
                 }
             }
         }
