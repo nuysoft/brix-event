@@ -221,6 +221,15 @@ describe('Event', function() {
 
             this.test.title += ' => ' + JSON.stringify(handler)
         })
+        it('foo', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(0)
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
     })
 
     describe('EventManager._parseBxEvents( prefix, element )', function() {
