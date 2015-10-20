@@ -374,6 +374,17 @@ define(
             var parts = RE_FN_ARGS.exec(handler)
             var method
             var params
+
+            if (parts && parts[1]) {
+                try {
+                    return {
+                        method: parts[1],
+                        /* jshint evil: true */
+                        params: eval('[' + (parts[2] || '') + ']')
+                    }
+                } catch (error) {}
+            }
+
             if (parts && parts[1]) {
                 method = parts[1]
                 params = parts[2] || ''

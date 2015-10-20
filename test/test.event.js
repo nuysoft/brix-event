@@ -221,12 +221,27 @@ describe('Event', function() {
 
             this.test.title += ' => ' + JSON.stringify(handler)
         })
-        it('foo', function() {
+        it('foo("a", "b", "c")', function() {
             handler = EventManager._parseMethodAndParams(this.test.title)
             expect(handler).to.have.property('method')
                 .that.be.a('string').equal('foo')
             expect(handler).to.have.property('params')
-                .that.be.an('array').with.length(0)
+                .that.be.an('array').with.length(3)
+            expect(handler.params[0]).to.be.equal('a')
+            expect(handler.params[1]).to.be.equal('b')
+            expect(handler.params[2]).to.be.equal('c')
+
+            this.test.title += ' => ' + JSON.stringify(handler)
+        })
+        it('foo(a,b,c)', function() {
+            handler = EventManager._parseMethodAndParams(this.test.title)
+            expect(handler).to.have.property('method')
+                .that.be.a('string').equal('foo')
+            expect(handler).to.have.property('params')
+                .that.be.an('array').with.length(3)
+            expect(handler.params[0]).to.be.equal('a')
+            expect(handler.params[1]).to.be.equal('b')
+            expect(handler.params[2]).to.be.equal('c')
 
             this.test.title += ' => ' + JSON.stringify(handler)
         })
