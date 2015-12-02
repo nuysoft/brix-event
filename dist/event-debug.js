@@ -130,8 +130,8 @@ define(
                     if (closestSeparation(prefix, event.currentTarget) !== data[BX_EVENT_SEPARATION + prefix]) return
 
                     var extraParameters = [].slice.call(arguments, 1)
-                    event.owner = owner
-                    event.component = function() {
+                    if (!event.owner) event.owner = owner
+                    if (!event.component) event.component = function() {
                         try {
                             // 尝试获取节点关联的组件实例
                             return require('brix/loader').query(event.currentTarget)[0]
