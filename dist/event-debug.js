@@ -143,6 +143,8 @@ define(
         }
 
         // 主菜
+        // event.namespace          通过 brix-event 管理的事件的命名空间都是 BX_EVENT_NAMESPACE
+        // event.originalNamespace  用于存放事件的原始命名空间
         function entrees(event, owner, prefix) {
             var extraParameters = [].slice.call(arguments, 3)
 
@@ -151,9 +153,20 @@ define(
 
             var parts = _parseMethodAndParams(handler)
             if (parts && owner[parts.method]) {
-                owner[parts.method].apply(
-                    owner, [event].concat(extraParameters).concat(parts.params)
-                )
+                // 尝试恢复 namespace
+                var namespace = event.namespace
+                var originalNamespace = event.originalNamespace
+                if (originalNamespace) event.namespace = originalNamespace
+
+                try {
+                    owner[parts.method].apply(
+                        owner, [event].concat(extraParameters).concat(parts.params)
+                    )
+                } finally {
+                    // 尝试恢复 namespace
+                    if (originalNamespace) event.namespace = namespace
+                }
+
             } else {
                 /* jshint evil:true */
                 eval(handler)
