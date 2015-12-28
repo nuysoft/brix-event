@@ -96,7 +96,7 @@ define(
             var types = _parseBxTypes(prefix, element)
             _.each(types, function(type /*, index*/ ) {
                 var bxtype = prefix + type // bx-type
-                var selector = '[' + bxtype + ']' // [bx-type]
+                var selector = ('[' + bxtype + ']').replace(/\./g, '\\.') // [bx-type]
 
                 // 已经代理过该类型的事件，无需再次代理
                 if (data[BX_EVENT_CACHE + prefix][bxtype]) return
@@ -147,7 +147,9 @@ define(
         function entrees(event, owner, prefix) {
             var extraParameters = [].slice.call(arguments, 3)
 
-            var handler = jQuery(event.currentTarget).attr(prefix + event.type)
+            var currentTarget = jQuery(event.currentTarget)
+            var handler = currentTarget.attr(prefix + event.type) ||
+                currentTarget.attr(prefix + event.type + '.' + event.namespace)
             if (!handler) return
 
             var parts = _parseMethodAndParams(handler)
