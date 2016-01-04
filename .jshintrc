@@ -2,5 +2,7 @@
     "asi": true,
     "strict": false,
     "undef": true,
-    "unused": "strict"
+    "unused": "strict",
+    "browser": true,
+    "predef": ["define", "require", "console"]
 }

@@ -3,6 +3,7 @@ var gulp = require('gulp')
 var through = require('through2')
 var connect = require('gulp-connect')
 var jshint = require('gulp-jshint')
+var webpack = require("webpack")
 var rjs = require('gulp-requirejs')
 var uglify = require('gulp-uglify')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
@@ -46,6 +47,40 @@ gulp.task('jshint', function() {
     return gulp.src(globs)
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'))
+})
+
+// https://webpack.github.io/docs/usage-with-gulp.html
+gulp.task("webpack", function( /*callback*/ ) {
+    webpack({
+        entry: './src/brix/event.js',
+        output: {
+            path: './dist',
+            filename: 'event.js',
+            library: 'brix/event',
+            libraryTarget: 'umd'
+        }
+    }, function(err /*, stats*/ ) {
+        // console.log(err, stats)
+        if (err) throw err
+    })
+    webpack({
+        entry: './src/brix/event.js',
+        devtool: 'source-map',
+        output: {
+            path: './dist',
+            filename: 'event.js',
+            library: 'brix/event',
+            libraryTarget: 'umd'
+        },
+        plugins: [
+            new webpack.optimize.UglifyJsPlugin({
+                minimize: true
+            })
+        ]
+    }, function(err /*, stats*/ ) {
+        // console.log(err, stats)
+        if (err) throw err
+    })
 })
 
 // https://github.com/RobinThrift/gulp-requirejs

@@ -1,3 +1,4 @@
+/* 废弃 */
 /* global require */
 /* global chai, describe, before, after, beforeEach, afterEach, it */
 /* jshint multistr: true */
