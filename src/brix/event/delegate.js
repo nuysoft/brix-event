@@ -21,7 +21,19 @@ define(
 		        3.2 在 body 上代理事件
 		        3.3 记录事件相关的属性 type、bxtype、namespace、selector、appetizer
 		 */
-		function delegate(prefix, element, owner) {
+		function delegate(prefix, types, element, owner) {
+			switch (arguments.length) {
+				case 3: // delegate(prefix, element, owner)
+					owner = element
+					element = types
+					types = []
+					break
+				case 4: // delegate(prefix, types, element, owner)
+					break
+				default:
+					throw '参数错误'
+			}
+
 			var $body = jQuery(document.body)
 			var $element = jQuery(element)
 			var data = $element.data()
@@ -31,7 +43,7 @@ define(
 			data[Constant.BX_EVENT_SEPARATION + prefix] = Math.random()
 			if (!data[Constant.BX_EVENT_CACHE + prefix]) data[Constant.BX_EVENT_CACHE + prefix] = {}
 
-			var types = Parser.parseBxTypes(prefix, element)
+			types = types && types.length ? types : Parser.parseBxTypes(prefix, element)
 			_.each(types, function(type /*, index*/ ) {
 				var bxtype = prefix + type // bx-type
 				var selector = ('[' + bxtype + ']').replace(/\./g, '\\.') // [bx-type]

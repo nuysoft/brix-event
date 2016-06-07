@@ -24,8 +24,10 @@ describe('Event Delegate & Trigger', function() {
         })
         it('$element.trigger()', function(done) {
             var owner = {
+                counter: 0,
                 answer: 42,
                 foo: function(event, arg1, arg2, arg3) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect(event.type).to.equal('click')
@@ -34,16 +36,31 @@ describe('Event Delegate & Trigger', function() {
                     ]).to.deep.equal([
                         42, '43', 44
                     ])
-                    done()
+
+                    if (this.counter === 3) done()
                 }
             }
             EventManager._delegate(prefix, container, owner)
             container.find('div').trigger('click')
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            container.find('div').trigger('click')
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            container.find('div').trigger('click')
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['click'], container, owner)
+            container.find('div').trigger('click')
         })
         it('$element.trigger( extraParameter )', function(done) {
             var owner = {
+                counter: 0,
                 answer: 42,
                 foo: function(event, arg1, arg2, arg3, arg4) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect(event.type).to.equal('click')
@@ -52,16 +69,32 @@ describe('Event Delegate & Trigger', function() {
                     ]).to.deep.equal([
                         41, 42, '43', 44
                     ])
-                    done()
+
+                    if (this.counter === 3) done()
                 }
             }
+
             EventManager._delegate(prefix, container, owner)
+            container.find('div').trigger('click', 41)
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            container.find('div').trigger('click', 41)
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            container.find('div').trigger('click', 41)
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['click'], container, owner)
             container.find('div').trigger('click', 41)
         })
         it('$element.trigger( [ extraParameter, extraParameter ] )', function(done) {
             var owner = {
+                counter: 0,
                 answer: 42,
                 foo: function(event, arg1, arg2, arg3, arg4, arg5) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect(event.type).to.equal('click')
@@ -70,16 +103,31 @@ describe('Event Delegate & Trigger', function() {
                     ]).to.deep.equal([
                         40, '41', 42, '43', 44
                     ])
-                    done()
+
+                    if (this.counter === 2) done()
                 }
             }
             EventManager._delegate(prefix, container, owner)
             container.find('div').trigger('click', [40, '41'])
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            container.find('div').trigger('click', [40, '41'])
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            container.find('div').trigger('click', [40, '41'])
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['click'], container, owner)
+            container.find('div').trigger('click', [40, '41'])
         })
         it('$element.click()', function(done) {
             var owner = {
+                counter: 0,
                 answer: 42,
                 foo: function(event, arg1, arg2, arg3) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect(event.type).to.equal('click')
@@ -88,16 +136,32 @@ describe('Event Delegate & Trigger', function() {
                     ]).to.deep.equal([
                         42, '43', 44
                     ])
-                    done()
+
+                    if (this.counter === 3) done()
                 }
             }
+
             EventManager._delegate(prefix, container, owner)
+            container.find('div').click()
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            container.find('div').click()
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            container.find('div').click()
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['click'], container, owner)
             container.find('div').click()
         })
         it('element.click()', function(done) {
             var owner = {
+                counter: 0,
                 answer: 42,
                 foo: function(event, arg1, arg2, arg3) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect(event.type).to.equal('click')
@@ -106,17 +170,37 @@ describe('Event Delegate & Trigger', function() {
                     ]).to.deep.equal([
                         42, '43', 44
                     ])
-                    done()
+
+                    if (this.counter === 2) done()
                 }
             }
+
             EventManager._delegate(prefix, container, owner)
             var $element = container.find('div')
+            if ($element[0].click) $element[0].click() // 浏览器
+            else $element.click() // phantomjs
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            $element = container.find('div')
+            if ($element[0].click) $element[0].click() // 浏览器
+            else $element.click() // phantomjs
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            $element = container.find('div')
+            if ($element[0].click) $element[0].click() // 浏览器
+            else $element.click() // phantomjs
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, 'click', container, owner)
+            $element = container.find('div')
             if ($element[0].click) $element[0].click() // 浏览器
             else $element.click() // phantomjs
         })
     })
 
-    describe('EventManager._delegate( prefix, element, owner ) Nested', function() {
+    describe('EventManager._delegate( prefix, types?, element, owner ) Nested', function() {
         beforeEach(function(done) {
             expect(
                 $._data(document.body).events
@@ -143,16 +227,20 @@ describe('Event Delegate & Trigger', function() {
             })
 
             var owner = {
+                counter: 0,
                 answer: 42
             }
             _.each(types, function(type, index) {
                 owner[type + 'Handle'] = function(event, arg) {
+                    this.counter++;
                     expect(this).to.equal(owner)
                     expect(this.answer).to.equal(42)
                     expect([event.type, event.handleObj.origType]).to.include(type)
                         // expect(event.type).to.equal(type)
                     expect(arg).to.equal(index)
                     if (event.type === 'error') event.stopPropagation()
+
+                    if (this.counter === (types.length + 2) * 3) done()
                 }
             })
 
@@ -160,7 +248,24 @@ describe('Event Delegate & Trigger', function() {
             _.each(types, function(type /*, index*/ ) {
                 $('[bx-' + type + ']', container).trigger(type)
             })
-            done()
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, [], container, owner)
+            _.each(types, function(type /*, index*/ ) {
+                $('[bx-' + type + ']', container).trigger(type)
+            })
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, ['abc'], container, owner)
+            _.each(types, function(type /*, index*/ ) {
+                $('[bx-' + type + ']', container).trigger(type)
+            })
+
+            EventManager._undelegate(prefix, container)
+            EventManager._delegate(prefix, types, container, owner)
+            _.each(types, function(type /*, index*/ ) {
+                $('[bx-' + type + ']', container).trigger(type)
+            })
         })
     })
 

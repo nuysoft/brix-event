@@ -199,89 +199,108 @@ define(
         return entrees
     }
 );
-define('brix/event/target/delegate',['jquery', 'underscore', '../constant', '../parser'], function(jQuery, _, Constant, Parser) {
-	// 在指定的节点上绑定事件
-	function delegate(prefix, type, element, owner) {
-		// $1 window|document|body, $2 type
-		Constant.RE_TARGET_TYPE.exec('')
-		var ma = Constant.RE_TARGET_TYPE.exec(type)
-		if (!ma) throw '不支持 ' + type
+define(
+	'brix/event/target/delegate',[
+		'jquery', 'underscore',
+		'../constant',
+		'../parser'
+	],
+	function(
+		jQuery, _,
+		Constant,
+		Parser
+	) {
+		// 在指定的节点上绑定事件
+		function delegate(prefix, type, element, owner) {
+			// $1 window|document|body, $2 type
+			Constant.RE_TARGET_TYPE.exec('')
+			var ma = Constant.RE_TARGET_TYPE.exec(type)
+			if (!ma) throw '不支持 ' + type
 
-		var bxtype = prefix + type
+			var bxtype = prefix + type
 
-		var $target =
-			ma[1] === 'window' && 　jQuery(window) ||
-			ma[1] === 'document' && 　jQuery(document) ||
-			ma[1] === 'body' && 　jQuery(document.body)
+			var $target =
+				ma[1] === 'window' && 　jQuery(window) ||
+				ma[1] === 'document' && 　jQuery(document) ||
+				ma[1] === 'body' && 　jQuery(document.body)
 
-		$target.on(ma[2] + Constant.BX_EVENT_NAMESPACE, _bxTargetTypeAppetizer)
-		$target.on(bxtype + Constant.BX_EVENT_NAMESPACE, _bxTargetTypeEntrees)
+			$target.on(ma[2] + Constant.BX_EVENT_NAMESPACE, _bxTargetTypeAppetizer)
+			$target.on(bxtype + Constant.BX_EVENT_NAMESPACE, _bxTargetTypeEntrees)
 
-		// 开胃菜
-		function _bxTargetTypeAppetizer(event) {
-			var originalType = event.type // click
-			event.type = bxtype // bx-window-click
-			jQuery(event.target).trigger(event, [].slice.call(arguments, 1))
-			event.type = originalType
+			// 开胃菜
+			function _bxTargetTypeAppetizer(event) {
+				var originalType = event.type // click
+				event.type = bxtype // bx-window-click
+				jQuery(event.target).trigger(event, [].slice.call(arguments, 1))
+				event.type = originalType
+			}
+
+			// 主菜
+			function _bxTargetTypeEntrees(event) {
+				var selector = '[' + prefix + type + ']'
+				var $targets = function() {
+					var targets = []
+					if (jQuery(event.target).is(selector)) targets.push(event.target)
+					var parents = jQuery(event.target).parentsUntil(element, selector)
+					targets = targets.concat(parents.toArray())
+					return jQuery(targets)
+				}()
+
+				// bx-target-type => type
+				var currentType = event.type // bx-target-type
+				var originalType = ma[2] // type
+				event.type = originalType
+
+				var extraParameters = [].slice.call(arguments, 2)
+
+				_.each($targets, function(item /*, index*/ ) {
+					var handler = jQuery(item).attr(currentType)
+					if (!handler) return
+
+					var parts = Parser.parseMethodAndParams(handler)
+					if (parts && owner[parts.method]) {
+						owner[parts.method].apply(
+							owner, [event].concat(extraParameters).concat(parts.params)
+						)
+					} else {
+						/* jshint evil:true */
+						eval(handler)
+					}
+				})
+
+				// type => bx-target-type
+				event.type = currentType
+			}
 		}
+		return delegate
+	});
+define(
+	'brix/event/target/undelegate',[
+		'jquery',
+		'../constant'
+	],
+	function(
+		jQuery,
+		Constant
+	) {
+		function undelegate(prefix, type /*, element*/ ) {
+			Constant.RE_TARGET_TYPE.exec('')
+			var ma = Constant.RE_TARGET_TYPE.exec(type)
+			if (!ma) throw '不支持 ' + type
 
-		// 主菜
-		function _bxTargetTypeEntrees(event) {
-			var selector = '[' + prefix + type + ']'
-			var $targets = function() {
-				var targets = []
-				if (jQuery(event.target).is(selector)) targets.push(event.target)
-				var parents = jQuery(event.target).parentsUntil(element, selector)
-				targets = targets.concat(parents.toArray())
-				return jQuery(targets)
-			}()
+			var bxtype = prefix + type
 
-			// bx-target-type => type
-			var currentType = event.type // bx-target-type
-			var originalType = ma[2] // type
-			event.type = originalType
+			var $target =
+				ma[1] === 'window' && 　jQuery(window) ||
+				ma[1] === 'document' && 　jQuery(document) ||
+				ma[1] === 'body' && 　jQuery(document.body)
 
-			var extraParameters = [].slice.call(arguments, 2)
-
-			_.each($targets, function(item /*, index*/ ) {
-				var handler = jQuery(item).attr(currentType)
-				if (!handler) return
-
-				var parts = Parser.parseMethodAndParams(handler)
-				if (parts && owner[parts.method]) {
-					owner[parts.method].apply(
-						owner, [event].concat(extraParameters).concat(parts.params)
-					)
-				} else {
-					/* jshint evil:true */
-					eval(handler)
-				}
-			})
-
-			// type => bx-target-type
-			event.type = currentType
+			$target.off(ma[2] + Constant.BX_EVENT_NAMESPACE)
+			$target.off(bxtype + Constant.BX_EVENT_NAMESPACE)
 		}
+		return undelegate
 	}
-	return delegate
-});
-define('brix/event/target/undelegate',['jquery', '../constant'], function(jQuery, Constant) {
-	function undelegate(prefix, type /*, element*/ ) {
-		Constant.RE_TARGET_TYPE.exec('')
-		var ma = Constant.RE_TARGET_TYPE.exec(type)
-		if (!ma) throw '不支持 ' + type
-
-		var bxtype = prefix + type
-
-		var $target =
-			ma[1] === 'window' && 　jQuery(window) ||
-			ma[1] === 'document' && 　jQuery(document) ||
-			ma[1] === 'body' && 　jQuery(document.body)
-
-		$target.off(ma[2] + Constant.BX_EVENT_NAMESPACE)
-		$target.off(bxtype + Constant.BX_EVENT_NAMESPACE)
-	}
-	return undelegate
-});
+);
 define('brix/event/target/index',['./delegate', './undelegate'], function(delegate, undelegate) {
 	return {
 		delegate: delegate,
@@ -311,7 +330,19 @@ define(
 		        3.2 在 body 上代理事件
 		        3.3 记录事件相关的属性 type、bxtype、namespace、selector、appetizer
 		 */
-		function delegate(prefix, element, owner) {
+		function delegate(prefix, types, element, owner) {
+			switch (arguments.length) {
+				case 3: // delegate(prefix, element, owner)
+					owner = element
+					element = types
+					types = []
+					break
+				case 4: // delegate(prefix, types, element, owner)
+					break
+				default:
+					throw '参数错误'
+			}
+
 			var $body = jQuery(document.body)
 			var $element = jQuery(element)
 			var data = $element.data()
@@ -321,7 +352,7 @@ define(
 			data[Constant.BX_EVENT_SEPARATION + prefix] = Math.random()
 			if (!data[Constant.BX_EVENT_CACHE + prefix]) data[Constant.BX_EVENT_CACHE + prefix] = {}
 
-			var types = Parser.parseBxTypes(prefix, element)
+			types = types && types.length ? types : Parser.parseBxTypes(prefix, element)
 			_.each(types, function(type /*, index*/ ) {
 				var bxtype = prefix + type // bx-type
 				var selector = ('[' + bxtype + ']').replace(/\./g, '\\.') // [bx-type]
@@ -390,27 +421,38 @@ define(
 		return delegate
 	}
 );
-define('brix/event/undelegate',['jquery', 'underscore', './constant', './target/index'], function(jQuery, _, Constant, Target) {
-    function undelegate(prefix, element) {
-        var $body = jQuery(document.body)
-        var $element = jQuery(element)
-        var data = $element.data()
+define(
+    'brix/event/undelegate',[
+        'jquery', 'underscore',
+        './constant',
+        './target/index'
+    ],
+    function(
+        jQuery, _,
+        Constant,
+        Target
+    ) {
+        function undelegate(prefix, element) {
+            var $body = jQuery(document.body)
+            var $element = jQuery(element)
+            var data = $element.data()
 
-        if (!data) return
+            if (!data) return
 
-        /* jshint unused:false */
-        _.each(data[Constant.BX_EVENT_CACHE + prefix], function(item, bxtype) {
-            Constant.RE_TARGET_TYPE.exec('')
-            if (Constant.RE_TARGET_TYPE.exec(item.type)) {
-                Target.undelegate(prefix, item.type, element)
-                return
-            }
-            $body.off(item.type + item.namespace, item.selector, item.appetizer)
-        })
-        data[Constant.BX_EVENT_CACHE + prefix] = {}
+            /* jshint unused:false */
+            _.each(data[Constant.BX_EVENT_CACHE + prefix], function(item, bxtype) {
+                Constant.RE_TARGET_TYPE.exec('')
+                if (Constant.RE_TARGET_TYPE.exec(item.type)) {
+                    Target.undelegate(prefix, item.type, element)
+                    return
+                }
+                $body.off(item.type + item.namespace, item.selector, item.appetizer)
+            })
+            data[Constant.BX_EVENT_CACHE + prefix] = {}
+        }
+        return undelegate
     }
-    return undelegate
-});
+);
 define(
     'brix/event',[
         './event/constant',
@@ -425,12 +467,13 @@ define(
         delegate, undelegate
     ) {
         // 事件管理器
-        function EventManager(prefix) {
+        function EventManager(prefix, types) {
             // Allow instantiation without the 'new' keyword
             if (!(this instanceof EventManager)) {
                 return new EventManager(prefix)
             }
             this.prefix = prefix || Constant.PREFIX
+            this.types = types || []
         }
 
         // 在节点 `element` 上代理 `bx-type` 风格的事件监听函数，事件监听函数定义在宿主对象 `owner` 中。
@@ -446,7 +489,7 @@ define(
             }
 
             undelegate(this.prefix, element)
-            delegate(this.prefix, element, owner)
+            delegate(this.prefix, this.types, element, owner)
 
             if (DEBUG) {
                 console.timeEnd(label)

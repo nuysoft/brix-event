@@ -12,12 +12,13 @@ define(
         delegate, undelegate
     ) {
         // 事件管理器
-        function EventManager(prefix) {
+        function EventManager(prefix, types) {
             // Allow instantiation without the 'new' keyword
             if (!(this instanceof EventManager)) {
                 return new EventManager(prefix)
             }
             this.prefix = prefix || Constant.PREFIX
+            this.types = types || []
         }
 
         // 在节点 `element` 上代理 `bx-type` 风格的事件监听函数，事件监听函数定义在宿主对象 `owner` 中。
@@ -33,7 +34,7 @@ define(
             }
 
             undelegate(this.prefix, element)
-            delegate(this.prefix, element, owner)
+            delegate(this.prefix, this.types, element, owner)
 
             if (DEBUG) {
                 console.timeEnd(label)
