@@ -6,6 +6,7 @@
 
 ```sh
 $ bower install --save brix-event
+$ npm install --save brix-event
 ```
 
 ### 用法 <small>Usage</small>
